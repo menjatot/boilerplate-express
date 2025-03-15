@@ -1,5 +1,6 @@
 require("dotenv").config();
-console.log("MESSAGE_STYLE: ", process.env.MESSAGE_STYLE);
+// console.log("MESSAGE_STYLE: ", process.env.MESSAGE_STYLE);
+const bodyParser = require("body-parser");
 let express = require("express");
 let app = express();
 console.log("Hello World");
@@ -12,6 +13,8 @@ app.use((req, res, next) => {
   console.log(string);
   next();
 });
+app.use(bodyParser.urlencoded({ extended: false }))
+
 app.get("/",  (req, res) => {
   // res.send('Hello Express')
   res.sendFile(absolutePath);
@@ -31,8 +34,32 @@ app.get("/json", (req, res) => {
   res.json({ message: response });
 });
 
+app.get('/now', (req, res, next) => {
+  req.time= new Date().toString()
+  next()
+}, (req, res) => {
+  res.json({time:req.time})
+  
+})
 
+app.get('/:word/echo', (req, res, next) => {
+  const word=req.params.word
+  res.json({echo:word})
+})
 
+// app.get('/name', (req, res, next) => {
+//   const nombre=req.query.first+' '+req.query.last
+//   res.json({name:nombre })
+// })
+
+app.route('/name').get((req, res, next) => {
+  const nombre=req.query.first+' '+req.query.last
+  res.json({name:nombre })
+
+}).post((req, res, next) => {
+  const nombre = req.body.first + ' ' + req.body.last
+  res.json({name:nombre})
+})
 
 
 module.exports = app;
